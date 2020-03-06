@@ -1,12 +1,13 @@
-// Copyright (c) Laurent Rioux. All rights reserved.
+// Copyright (c) Sandeep Mistry. All rights reserved.
+// adapted to raspberry pi by Laurent Rioux Copyright (c) - mùarch 2020. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #include "LoRa.h"
 #include <iostream>
 #include <fstream>
-#include <thread>
 #include <wiringPiSPI.h>
 using namespace std;
+
 
 // registers
 #define REG_FIFO                 0x00
@@ -87,7 +88,6 @@ __inline__ void DISABLE_INTERRUPTS(void) {
     }
 }
 
-
 LoRaClass::LoRaClass() :
   _spi_frequency(LORA_DEFAULT_SPI_FREQUENCY),
   _spi(LORA_DEFAULT_SPI),
@@ -167,11 +167,6 @@ void LoRaClass::end()
 {
   // put in sleep mode
   sleep();
-
-  // stop SPI
-   //bcm2835_spi_end();
-   //bcm2835_close();
-
 }
 
 
@@ -202,15 +197,17 @@ int LoRaClass::endPacket(bool async)
 {
 
 if ((async) && (_onTxDone)) {
-      writeRegister(REG_DIO_MAPPING_1, 0x40); // DIO0 => TXDONE
+     writeRegister(REG_DIO_MAPPING_1, 0x40); // DIO0 => TXDONE
+    
 }
+
   // put in TX mode
   writeRegister(REG_OP_MODE, MODE_LONG_RANGE_MODE | MODE_TX);
 
   if (!async) {
     // wait for TX done
      while ((readRegister(REG_IRQ_FLAGS) & IRQ_TX_DONE_MASK) == 0) {
-      //std::this_thread::yield();
+       // std::this_thread::yield();
     }
     // clear IRQ's
     writeRegister(REG_IRQ_FLAGS, IRQ_TX_DONE_MASK);
@@ -381,29 +378,20 @@ void LoRaClass::onReceive(void(*callback)(int))
 {
   _onReceive = callback;
 
-  if (callback) {
+  if ((callback) && (!_onTxDone)) {  //  create IRQ thread only if it is not already created by onTxDone
+
     pinMode(_dio0, INPUT);
-
-    writeRegister(REG_DIO_MAPPING_1, 0x00);
-
-//#ifdef SPI_HAS_NOTUSINGINTERRUPT
-//    SPI.usingInterrupt(digitalPinToInterrupt(_dio0));
-//#endif
 
     if (wiringPiISR(_dio0, INT_EDGE_RISING, &LoRaClass::onDio0Rise) <0) {
           printf("Error initialising interrupt Pin: %d\n", _dio0);
     }
-  } else {
-   
-     //detachInterrupt(digitalPinToInterrupt(_dio0));
-//#ifdef SPI_HAS_NOTUSINGINTERRUPT
-     //    SPI.notUsingInterrupt(digitalPinToInterrupt(_dio0));
-//#endif
   }
 }
 
 void LoRaClass::receive(int size)
 {
+  writeRegister(REG_DIO_MAPPING_1, 0x00); // DIO0 => RXDONE
+
   if (size > 0) {
     implicitHeaderMode();
 
@@ -416,6 +404,7 @@ void LoRaClass::receive(int size)
 
 void LoRaClass::idle()
 {
+// writeRegister(REG_DIO_MAPPING_1, 0x01); // DIO0 => RXDONE
   writeRegister(REG_OP_MODE, MODE_LONG_RANGE_MODE | MODE_STDBY);
 }
 
@@ -659,13 +648,9 @@ void LoRaClass::dumpRegisters(ostream& out)
 {
   for (int i = 0; i < 128; i++) { 
 
-//      out.print("0x");
       out << "0x";
-//    out.print(i, HEX);
       out << std::hex << i;
-//    out.print(": 0x");
       out << ": 0x";
-//    out.println(readRegister(i), HEX);
       out << std::hex << (int)readRegister(i)  << '\n';
   }
 }
@@ -693,7 +678,8 @@ void LoRaClass::handleDio0Rise()
 
   if ((irqFlags & IRQ_PAYLOAD_CRC_ERROR_MASK) == 0) {
 
-    if ((irqFlags & IRQ_RX_DONE_MASK) != 0) {
+    if ((irqFlags & IRQ_RX_DONE_MASK)!= 0) {
+
       // received a packet
       _packetIndex = 0;
 
@@ -737,8 +723,6 @@ uint8_t LoRaClass::singleTransfer(uint8_t address, uint8_t value)
    
     digitalWrite(_ss, LOW);
 
-    //bcm2835_delay(1);
-   
     DISABLE_INTERRUPTS();
   
     wiringPiSPIDataRW (_spi, buf, 2) ;
@@ -761,29 +745,13 @@ void LoRaClass::onTxDone(void(*callback)())
 {
   _onTxDone = callback;
 
-  if (callback) {
+   if ((callback) && (!_onReceive)) { // create IRQ Thread only if it is not already created by onReceive
     pinMode(_dio0, INPUT);
-
-
-//  #ifdef SPI_HAS_NOTUSINGINTERRUPT
-  //    SPI.usingInterrupt(digitalPinToInterrupt(_dio0));
-//  #endif
 
     if (wiringPiISR(_dio0, INT_EDGE_RISING, &LoRaClass::onDio0Rise) <0) {
           printf("Error initialising interrupt Pin: %d\n", _dio0);
-    }
-
+    } 
   } 
-  /* else {
-  
-     //detachInterrupt(digitalPinToInterrupt(_dio0));
-
-#ifdef SPI_HAS_NOTUSINGINTERRUPT
-      SPI.notUsingInterrupt(digitalPinToInterrupt(_dio0));
-#endif
-
-
-  } */
 }
 
 LoRaClass LoRa;

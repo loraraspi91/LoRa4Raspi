@@ -1,4 +1,5 @@
-// Copyright (c) Laurent Rioux. All rights reserved.
+// Copyright (c) Sandeep Mistry. All rights reserved.
+// adapted to raspberry pi by Laurent Rioux Copyright (c) - mùarch 2020. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #ifndef LORA_H
@@ -115,9 +116,7 @@ private:
 
   static void onDio0Rise();
 
-private:
-//  SPISettings _spiSettings;
-//  SPIClass* _spi;
+private: 
   uint32_t _spi_frequency;
   int _spi;
   int _ss;

@@ -17,6 +17,10 @@
 */
 
 #include "WString.h"
+#include <stdlib.h>
+#include <iostream> 
+#include "itoa.h"
+
 
 /*********************************************/
 /*  Constructors                             */
@@ -168,30 +172,21 @@ String & String::operator = (const String &rhs)
 
 String & String::operator = (String &&rval)
 {
-	if (this != &rval) move(rval);
+	if (this != &rval) std::move(rval);
 	return *this;
 }
 
 String & String::operator = (StringSumHelper &&rval)
 {
-	if (this != &rval) move(rval);
+	if (this != &rval) std::move(rval);
 	return *this;
 }
-#endif
 
 String & String::operator = (const char *cstr)
 {
 	if (cstr) copy(cstr, strlen(cstr));
 	else invalidate();
 	
-	return *this;
-}
-
-String & String::operator = (const __FlashStringHelper *pstr)
-{
-	if (pstr) copy(pstr, strlen_P((PGM_P)pstr));
-	else invalidate();
-
 	return *this;
 }
 
@@ -278,18 +273,6 @@ unsigned char String::concat(double num)
 	return concat(string, strlen(string));
 }
 
-unsigned char String::concat(const __FlashStringHelper * str)
-{
-	if (!str) return 0;
-	int length = strlen_P((const char *) str);
-	if (length == 0) return 1;
-	unsigned int newlen = len + length;
-	if (!reserve(newlen)) return 0;
-	strcpy_P(buffer + len, (const char *) str);
-	len = newlen;
-	return 1;
-}
-
 /*********************************************/
 /*  Concatenate                              */
 /*********************************************/
@@ -361,13 +344,6 @@ StringSumHelper & operator + (const StringSumHelper &lhs, double num)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
 	if (!a.concat(num)) a.invalidate();
-	return a;
-}
-
-StringSumHelper & operator + (const StringSumHelper &lhs, const __FlashStringHelper *rhs)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (!a.concat(rhs))	a.invalidate();
 	return a;
 }
 
@@ -692,3 +668,13 @@ double String::toDouble(void) const
 	if (buffer) return atof(buffer);
 	return 0;
 }
+
+
+std::ostream& operator<< (std::ostream &out, const String  &string)
+{
+    // Since operator<< is a friend of the Point class, we can access Point's members directly.
+    out << string.buffer; // actual output done here
+ 
+    return out; // return std::ostream so we can chain calls to operator<<
+}
+

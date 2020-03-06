@@ -1,4 +1,4 @@
-/*
+ /*
   WString.h - String library for Wiring & Arduino
   ...mostly rewritten by Paul Stoffregen...
   Copyright (c) 2009-10 Hernando Barragan.  All right reserved.
@@ -23,7 +23,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <iostream>
 
+using namespace std;
 
 // An inherited class for holding the result of a concatenation.  These
 // result objects are assumed to be writable by subsequent concatenations.
@@ -172,8 +174,10 @@ public:
 	float toFloat(void) const;
 	double toDouble(void) const;
 
-protected:
+        friend std::ostream& operator<< (std::ostream &out, const String &string);
 	char *buffer;	        // the actual char array
+
+protected:
 	unsigned int capacity;  // the array length minus one (for the '\0')
 	unsigned int len;       // the String length (not counting the '\0')
 protected:
@@ -200,6 +204,8 @@ public:
 	StringSumHelper(float num) : String(num) {}
 	StringSumHelper(double num) : String(num) {}
 };
+
+//friend std::ostream& operator<< (std::ostream &out, const String &string);
 
 #endif  // __cplusplus
 #endif // String_class_h
