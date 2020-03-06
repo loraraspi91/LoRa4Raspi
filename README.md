@@ -1,4 +1,4 @@
-# LoRa4Raspi
+# LoRa4Raspi: LoRa for Raspberry Pi
 
 This library is a porting of the LoRa Arduino library developped by Sandeep Mistry to Raspberry Pi
 you will find all information about this arduino libray here: https://github.com/sandeepmistry/arduino-LoRa
@@ -10,7 +10,7 @@ This Arduino is also very easy use and I would like to have the same approach on
 Since this libray as the same API, it is very easy to port your Arduino LoRa developpement on Raspberry Pi.
 
 
-* Installation
+# Installation
 
 This library required the WiringPi Library, to install it
 
@@ -18,7 +18,7 @@ This library required the WiringPi Library, to install it
 
 
  
-* usage of this library:
+# usage of this library:
 This library as the same API same the original library  So for more information please look original library.
 
 here : https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md
