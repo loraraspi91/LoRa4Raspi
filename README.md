@@ -23,7 +23,7 @@ This library as the same API same the original library  So for more information 
 
 here : https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md
 
-please used "LoRa.h" since all files will be inside your folde
+please used "LoRa.h" since all files will be inside your folder
 
 I ported the examples to help you to use this library for your raspberry pi
 
