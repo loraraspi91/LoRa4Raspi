@@ -52,6 +52,8 @@ public:
   int packetRssi();
   float packetSnr();
   long packetFrequencyError();
+  
+  int rssi();
 
   // from Print
 
