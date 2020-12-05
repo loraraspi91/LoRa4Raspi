@@ -81,6 +81,7 @@ public:
   void receive(int size=0);
 
   void setOCP(uint8_t mA); // Over Current Protection control
+  void setGain(uint8_t gain); // Set LNA gain
 
   // deprecated
   void crc() { enableCrc(); }
