@@ -28,7 +28,7 @@ void setup() {
   }
   printf("Init LoRa Done !!\n");
 
-  // Uncomment the next line to disable the default AGC and set LNA gain, values between 1 - 6 are supported
+  // Uncomment the next line to disable the default AGC and set LNA gain, only values between 1 - 6 are supported
   // LoRa.setGain(6);
 
 
