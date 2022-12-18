@@ -41,7 +41,8 @@ void setup() {
 }
 
 void loop() {
-// do nothing
+// just waiting onReceive callback; nothing done here
+sleep(60000);
 }
 
 
