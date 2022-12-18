@@ -1,5 +1,5 @@
 // Copyright (c) Sandeep Mistry. All rights reserved.
-// adapted to raspberry pi by Laurent Rioux Copyright (c) - mùarch 2020. All rights reserved.
+// adapted to raspberry pi by Laurent Rioux Copyright (c) - march 2020. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 #include "LoRa.h"
